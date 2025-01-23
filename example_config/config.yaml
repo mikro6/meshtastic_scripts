@@ -1,0 +1,31 @@
+# This is the config script I am using for the SX1262 XXXM LoRaWAN/GNSS HAT
+# https://www.waveshare.com/wiki/SX1262_XXXM_LoRaWAN/GNSS_HAT
+#
+# Note: It may work for others with other SX126X modules without GPS, but I have not tested it.
+#       If your board does not have GPS, just comment out the GPS section.
+---
+Lora:
+  Module: sx1262 # Waveshare SX126X XXXM
+  DIO2_AS_RF_SWITCH: true
+  CS: 21
+  IRQ: 16
+  Busy: 20
+  Reset: 18
+
+GPS:
+  SerialPath: /dev/ttyAMA0
+
+Logging:
+  LogLevel: info # debug, info, warn, error
+  TraceFile: /var/log/meshtasticd.json
+  AsciiLogs: true     # default if not specified is !isatty() on stdout
+
+Webserver:
+  Port: 443 # Port for Webserver & Webservices
+  RootPath: /usr/share/meshtasticd/web # Root Dir of WebServer
+
+General:
+  MaxNodes: 200
+  MaxMessageQueue: 100
+  ConfigDirectory: /etc/meshtasticd/config.d/
+  MACAddressSource: eth0
