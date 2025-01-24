@@ -31,7 +31,8 @@ The new `live.sh` script allows you to streamline the setup process by running e
 To streamline the setup process, you can use the `live.sh` script. Run the following command to get started:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/live_install_scripts/live.sh | bash
+bash <( curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/live_install
+_scripts/live.sh )
 ```
 
 ### How It Works

@@ -10,7 +10,8 @@ SCRIPTS=(
 HISTORY_FILE="$HOME/.fixedbit/meshtastic_history"
 ALIAS_FILE="$HOME/.bash_aliases"
 ALIAS_NAME="meshtastic-update"
-ALIAS_COMMAND="curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/live_install_scripts/live.sh | bash"
+ALIAS_COMMAND="bash <( curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/live_install
+_scripts/live.sh )"
 
 # Ensure history file exists
 mkdir -p "$(dirname "$HISTORY_FILE")"
