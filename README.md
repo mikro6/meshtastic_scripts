@@ -2,8 +2,6 @@
 
 This project contains a collection of scripts designed to streamline the setup and configuration of the Waveshare LoRaWAN/GNSS HAT and Meshtastic on Raspberry Pi devices.
 
-The new `live.sh` script allows you to streamline the setup process by running everything directly from your terminal without cloning the repository.
-
 ## Features
 - Automated setup for the Waveshare LoRaWAN/GNSS HAT with SPI and I2C configuration.
 - Easy installation and update of Meshtastic CLI and Meshtasticd service.
@@ -15,35 +13,13 @@ The new `live.sh` script allows you to streamline the setup process by running e
 ---
 
 ## Table of Contents
-1. [Quick Start with Live Script](#quick-start-with-live-script)
-2. [Requirements](#requirements)
-3. [Setup Instructions](#setup-instructions)
+1. [Requirements](#requirements)
+2. [Setup Instructions](#setup-instructions)
    - [Raspberry Pi LoRa HAT Configuration](#raspberry-pi-lora-hat-configuration)
    - [Meshtastic Setup](#meshtastic-setup)
    - [NC Mesh Device Configuration](#nc-mesh-device-configuration)
-4. [Example Configuration](#example-configuration)
-5. [Credits](#credits)
-
----
-
-## Quick Start with Live Script
-
-To streamline the setup process, you can use the `live.sh` script. Run the following command to get started:
-
-```bash
-bash <( curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/live_install
-_scripts/live.sh )
-```
-
-### How It Works
-- This script will provide a menu with options to run the individual setup scripts:
-  1. LoRA Raspberry Pi HAT Setup
-  2. Meshtastic CLI and Meshtasticd Setup/Update
-  3. NC Mesh Device Configuration
-- The menu tracks which scripts you've already run and displays their status:
-  - `(DONE)` indicates the script has already been run.
-  - `(Not yet done)` indicates it hasn't been run yet.
-- You can also set up a reusable alias (e.g., `meshtastic-update`) for easy future updates.
+3. [Example Configuration](#example-configuration)
+4. [Credits](#credits)
 
 ---
 
