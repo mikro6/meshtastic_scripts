@@ -13,7 +13,7 @@ Lora:
   Reset: 18
 
 GPS:
-  SerialPath: /dev/ttyAMA0
+  SerialPath: /dev/ttyS0
 
 Logging:
   LogLevel: info # debug, info, warn, error

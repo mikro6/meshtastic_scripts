@@ -266,3 +266,5 @@ install_or_update_meshtasticd
 # Display the banner
 display_meshtastic_banner
 
+# reboot note
+echo "NOTE: If this is your first time installing Meshtastic, please reboot your device to apply the changes."

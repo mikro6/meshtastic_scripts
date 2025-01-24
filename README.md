@@ -1,9 +1,8 @@
-
 # Waveshare LoRa HAT and Meshtastic Setup Scripts
 
 This project contains a collection of scripts designed to streamline the setup and configuration of the Waveshare LoRaWAN/GNSS HAT and Meshtastic on Raspberry Pi devices.
 
-The "meshtastic_setup.sh" script will more than likely work just fine to install / update meshtasticd on other systems too.
+The new `live.sh` script allows you to streamline the setup process by running everything directly from your terminal without cloning the repository.
 
 ## Features
 - Automated setup for the Waveshare LoRaWAN/GNSS HAT with SPI and I2C configuration.
@@ -11,16 +10,39 @@ The "meshtastic_setup.sh" script will more than likely work just fine to install
 - Backup and restore of Meshtastic configurations.
 - Support for multiple architectures: `amd64`, `arm64`, `armhf`.
 - Example configuration file for customizing your setup.
+- `ncmesh_connect.sh` to easily set up and configure Meshtastic devices for the NC Mesh network.
 
 ---
 
 ## Table of Contents
-1. [Requirements](#requirements)
-2. [Setup Instructions](#setup-instructions)
+1. [Quick Start with Live Script](#quick-start-with-live-script)
+2. [Requirements](#requirements)
+3. [Setup Instructions](#setup-instructions)
    - [Raspberry Pi LoRa HAT Configuration](#raspberry-pi-lora-hat-configuration)
    - [Meshtastic Setup](#meshtastic-setup)
-3. [Example Configuration](#example-configuration)
-4. [Credits](#credits)
+   - [NC Mesh Device Configuration](#nc-mesh-device-configuration)
+4. [Example Configuration](#example-configuration)
+5. [Credits](#credits)
+
+---
+
+## Quick Start with Live Script
+
+To streamline the setup process, you can use the `live.sh` script. Run the following command to get started:
+
+```bash
+curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/live_install_scripts/live.sh | bash
+```
+
+### How It Works
+- This script will provide a menu with options to run the individual setup scripts:
+  1. LoRA Raspberry Pi HAT Setup
+  2. Meshtastic CLI and Meshtasticd Setup/Update
+  3. NC Mesh Device Configuration
+- The menu tracks which scripts you've already run and displays their status:
+  - `(DONE)` indicates the script has already been run.
+  - `(Not yet done)` indicates it hasn't been run yet.
+- You can also set up a reusable alias (e.g., `meshtastic-update`) for easy future updates.
 
 ---
 
@@ -38,6 +60,7 @@ The "meshtastic_setup.sh" script will more than likely work just fine to install
 ## Setup Instructions
 
 ### Raspberry Pi LoRa HAT Configuration
+If you prefer not to use the live script, you can manually configure the LoRa HAT:
 1. Clone this repository:
    ```bash
    git clone https://github.com/FixedBit/meshtastic_scripts.git
@@ -69,20 +92,25 @@ The "meshtastic_setup.sh" script will more than likely work just fine to install
 
 ---
 
-## Example Configuration
-An example configuration file for the Waveshare LoRaWAN/GNSS HAT is included in this repository. You can find it at `example_config/config.yaml`.
-
-### Key Configuration Parameters
-- **LoRa Module**: Specifies the module (e.g., `sx1262`) and pin mappings.
-- **GPS**: Defines the serial path for GPS (optional).
-- **Logging**: Adjusts logging levels and output files.
-- **Webserver**: Configures the port and root path for the Meshtastic web server.
-- **General**: Controls limits for nodes, messages, and MAC address source.
-
-To use the configuration:
-1. Copy the example file to the appropriate location:
+### NC Mesh Device Configuration
+1. Run the NC Mesh configuration script:
    ```bash
-   sudo mkdir -p /etc/meshtasticd && sudo cat example_config/config.yaml > /etc/meshtasticd/config.yaml
+   sudo ./ncmesh_connect.sh
+   ```
+   - This script will:
+     - Prompt for the device owner name and short name.
+     - Allow selection of the device mode (Client, Router, etc.).
+     - Configure LoRa, GPS, MQTT, and channel settings specific to the NC Mesh network.
+   - Ensure your device is properly configured for use with NC Mesh.
+
+---
+
+## Example Configuration
+An example configuration file for the Waveshare LoRaWAN/GNSS HAT is available online. The live script fetches it automatically, but if needed, you can manually download and apply it:
+
+1. Download the example configuration:
+   ```bash
+   curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/example_config/config.yaml | sudo tee /etc/meshtasticd/config.yaml > /dev/null
    ```
 
 2. Edit the file to suit your setup:
