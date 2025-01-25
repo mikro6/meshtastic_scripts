@@ -8,6 +8,48 @@ echo "-=          Shoutout to the North Carolina Meshtastic Community!          
 echo "-=    Website https://ncmesh.net | Discord: https://discord.gg/xUzRAjHZk8    =-"
 echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
+
+# Function to locate and verify the Meshtastic CLI
+find_and_verify_meshtastic() {
+    # Attempt to find meshtastic in the PATH
+    MESHTASTIC_CMD=$(command -v meshtastic)
+
+    # Check common installation paths if not found in PATH
+    if [[ -z "$MESHTASTIC_CMD" ]]; then
+        local paths=(
+            "/opt/meshtastic-venv/bin/meshtastic"
+            "/usr/local/bin/meshtastic"
+            "/usr/bin/meshtastic"
+            "$HOME/.local/bin/meshtastic"
+        )
+        for path in "${paths[@]}"; do
+            if [[ -x "$path" ]]; then
+                MESHTASTIC_CMD="$path"
+                break
+            fi
+        done
+    fi
+
+    # Exit if Meshtastic CLI is still not found
+    if [[ -z "$MESHTASTIC_CMD" ]]; then
+        echo "Error: Meshtastic CLI not found."
+        echo "Ensure it is installed and its path is added to your environment."
+        exit 1
+    fi
+
+    # Verify the Meshtastic CLI works
+    if ! "$MESHTASTIC_CMD" --help >/dev/null 2>&1; then
+        echo "Error: Meshtastic CLI is installed but not working properly."
+        echo "Please check your installation or reinstall the Meshtastic CLI."
+        exit 1
+    fi
+
+    echo "Meshtastic CLI located and verified: $MESHTASTIC_CMD"
+}
+
+# Locate and verify Meshtastic CLI
+find_and_verify_meshtastic
+
 # Function to execute and check commands
 run_command() {
     echo "Executing: $1"
@@ -50,28 +92,27 @@ esac
 
 # Configure device owner, short name, and role
 echo "Configuring device owner, short name, and role..."
-run_command "meshtastic --host localhost --set-owner '$owner_name' --set-owner-short '$short_name' --set device.role $device_role"
+run_command "${MESHTASTIC_CMD} --host localhost --set-owner '$owner_name' --set-owner-short '$short_name' --set device.role $device_role"
 
 # Configure LoRa settings
 echo "Configuring LoRa settings..."
-run_command "meshtastic --host localhost --set lora.region US --set lora.tx_power 30 --set lora.hop_limit 4"
+run_command "${MESHTASTIC_CMD} --host localhost --set lora.region US --set lora.tx_power 30 --set lora.hop_limit 4"
 
 # Configure position settings
 echo "Configuring position settings..."
-run_command "meshtastic --host localhost --set position.gps_mode ENABLED --set position.gps_update_interval 1800 --set position.position_broadcast_secs 3600 --set position.broadcast_smart_minimum_interval_secs 1800 --set position.broadcast_smart_minimum_distance 100"
+run_command "${MESHTASTIC_CMD} --host localhost --set position.gps_mode ENABLED --set position.gps_update_interval 1800 --set position.position_broadcast_secs 3600 --set position.broadcast_smart_minimum_interval_secs 1800 --set position.broadcast_smart_minimum_distance 100"
 
 # Configure MQTT settings
 echo "Configuring MQTT settings..."
-run_command "meshtastic --host localhost --set mqtt.enabled true --set mqtt.address mqtt.ncmesh.net --set mqtt.username meshdev --set mqtt.password large4cats --set mqtt.proxy_to_client_enabled true --set mqtt.map_reporting_enabled true"
+run_command "${MESHTASTIC_CMD} --host localhost --set mqtt.enabled true --set mqtt.address mqtt.ncmesh.net --set mqtt.username meshdev --set mqtt.password large4cats --set mqtt.proxy_to_client_enabled true --set mqtt.map_reporting_enabled true"
 
 # Configure primary channel
 echo "Configuring primary channel (LongFast)..."
-run_command "meshtastic --host localhost --ch-set name 'LongFast' --ch-index 0 --ch-set uplink_enabled true --ch-set downlink_enabled true --ch-set module_settings.position_precision 1 --ch-index 0"
+run_command "${MESHTASTIC_CMD} --host localhost --ch-set name 'LongFast' --ch-index 0 --ch-set uplink_enabled true --ch-set downlink_enabled true --ch-set module_settings.position_precision 14 --ch-index 0"
 
 # Add and configure secondary channel
 echo "Adding and configuring secondary channel (NCMesh)..."
-run_command "meshtastic --host localhost --ch-add 1"
-run_command "meshtastic --host localhost --ch-set name 'NCMesh' --ch-index 1 --ch-set uplink_enabled true --ch-set downlink_enabled true --ch-set module_settings.position_precision 1 --ch-index 1 --ch-set psk 'default' --ch-index 1"
-
+run_command "${MESHTASTIC_CMD} --host localhost --ch-add 1"
+run_command "${MESHTASTIC_CMD} --host localhost --ch-set name 'NCMesh' --ch-index 1 --ch-set uplink_enabled true --ch-set downlink_enabled true --ch-set module_settings.position_precision 14 --ch-index 1 --ch-set psk 'default' --ch-index 1"
 # Final Confirmation
 echo "Meshtastic device setup completed successfully!"

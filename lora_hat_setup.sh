@@ -27,6 +27,10 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 1
 fi
 
+# Detect Raspberry Pi model
+MODEL=$(grep -o "Raspberry Pi [0-9]" /proc/device-tree/model)
+echo "Detected Raspberry Pi model: $MODEL"
+
 echo "Configuring SPI and I2C support on your Raspberry Pi..."
 
 # Enable SPI
@@ -37,20 +41,29 @@ sudo raspi-config nonint set_config_var dtparam=spi on "${CONFIG_FILE}"
 echo "Enabling I2C support..."
 sudo raspi-config nonint set_config_var dtparam=i2c_arm on "${CONFIG_FILE}"
 
-# Ensure dtoverlay=spi0-0cs is set in /boot/firmware/config.txt without altering dtoverlay=vc4-kms-v3d or dtparam=uart0
-echo "Configuring dtoverlay for SPI..."
-sudo sed -i -e '/^\s*#\?\s*dtoverlay\s*=\s*vc4-kms-v3d/! s/^\s*#\?\s*(dtoverlay|dtparam\s*=\s*uart0)\s*=.*/dtoverlay=spi0-0cs/' "${CONFIG_FILE}"
-
-# Insert dtoverlay=spi0-0cs after dtparam=spi=on if not already present
-if ! sudo grep -q '^\s*dtoverlay=spi0-0cs' "${CONFIG_FILE}"; then
-    sudo sed -i '/^\s*dtparam=spi=on/a dtoverlay=spi0-0cs' "${CONFIG_FILE}"
+# Configure for Raspberry Pi 5 specific settings
+if [[ "$MODEL" == "Raspberry Pi 5" ]]; then
+    echo "Applying Raspberry Pi 5-specific configurations..."
+    if ! sudo grep -q '^dtoverlay=spi0-0cs' "${CONFIG_FILE}"; then
+        echo "Adding dtoverlay=spi0-0cs for SPI..."
+        sudo sed -i '/^\s*dtparam=spi=on/a dtoverlay=spi0-0cs' "${CONFIG_FILE}"
+    fi
+    echo "Enabling UART for Pi 5..."
+    sudo raspi-config nonint set_config_var enable_uart 1 "${CONFIG_FILE}"
+    if ! sudo grep -q '^dtoverlay=uart0' "${CONFIG_FILE}"; then
+        echo "Adding dtoverlay=uart0 for UART on Pi 5..."
+        echo "dtoverlay=uart0" | sudo tee -a "${CONFIG_FILE}" > /dev/null
+    fi
+    echo "UART port for GPS on Pi 5 will be /dev/ttyAMA0."
+else
+    # Default configurations for Raspberry Pi 4 and earlier
+    echo "Applying configurations for Raspberry Pi 4 or earlier..."
+    if ! sudo grep -q '^dtoverlay=spi0-0cs' "${CONFIG_FILE}"; then
+        echo "Adding dtoverlay=spi0-0cs for SPI..."
+        sudo sed -i '/^\s*dtparam=spi=on/a dtoverlay=spi0-0cs' "${CONFIG_FILE}"
+    fi
+    echo "UART port for GPS on Pi 4 and earlier will be /dev/ttyS0."
 fi
-
-echo "Enable GPS if installed on your HAT."
-sudo raspi-config nonint do_serial_hw 0
-
-echo "Disable serial console."
-sudo raspi-config nonint do_serial_cons 1
 
 # Offer to fetch and copy the Meshtasticd configuration
 read -p "Would you like to fetch the Meshtasticd configuration for the Waveshare LoRa HAT? (yes/no) [Default: yes]: " config_choice
@@ -73,6 +86,17 @@ if [[ "$config_choice" == "yes" ]]; then
 
     if [[ $? -eq 0 ]]; then
         echo "Configuration fetched and saved successfully to ${TARGET_CONFIG_FILE}."
+
+        # Modify the config for Raspberry Pi 5 if detected
+        if [[ "$MODEL" == "Raspberry Pi 5" ]]; then
+            echo "Updating config.yaml for Raspberry Pi 5..."
+            sudo sed -i 's|SerialPath: /dev/ttyS0|SerialPath: /dev/ttyAMA0|' "${TARGET_CONFIG_FILE}"
+            if [[ $? -eq 0 ]]; then
+                echo "Config.yaml updated for Raspberry Pi 5 successfully."
+            else
+                echo "Failed to update config.yaml for Raspberry Pi 5."
+            fi
+        fi
     else
         echo "Failed to fetch the configuration. Please check your internet connection and try again."
     fi

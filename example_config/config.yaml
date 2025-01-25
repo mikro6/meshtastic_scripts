@@ -13,6 +13,7 @@ Lora:
   Reset: 18
 
 GPS:
+# For Pi 5, change the path to this: /dev/ttyAMA0
   SerialPath: /dev/ttyS0
 
 Logging:

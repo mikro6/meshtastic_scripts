@@ -105,7 +105,51 @@ get_release_url() {
         jq -r ".assets[] | select(.name | contains(\"${platform}.deb\")) | .browser_download_url"
 }
 
-# Function to create Python virtual environment and install the meshtastic CLI
+# Function to locate and verify the Meshtastic CLI
+check_meshtastic_cli() {
+    # Attempt to find meshtastic in the PATH or common installation paths
+    MESHTASTIC_CMD=$(command -v meshtastic)
+
+    # Check common paths if not found in PATH
+    if [[ -z "$MESHTASTIC_CMD" ]]; then
+        local paths=(
+            "/opt/meshtastic-venv/bin/meshtastic"
+            "/usr/local/bin/meshtastic"
+            "/usr/bin/meshtastic"
+            "$HOME/.local/bin/meshtastic"
+        )
+        for path in "${paths[@]}"; do
+            if [[ -x "$path" ]]; then
+                MESHTASTIC_CMD="$path"
+                break
+            fi
+        done
+    fi
+
+    # If still not found, prompt to install
+    if [[ -z "$MESHTASTIC_CMD" ]]; then
+        echo "Meshtastic CLI is not installed or not in the expected paths."
+        read -p "Do you want to install it? (yes/no): [Default: yes] " choice
+        choice=${choice:-yes}
+        if [[ "$choice" == "yes" ]]; then
+            install_meshtastic_cli
+        else
+            echo "Meshtastic CLI installation skipped. Exiting."
+            exit 1
+        fi
+    fi
+
+    # Verify the Meshtastic CLI works
+    if ! "$MESHTASTIC_CMD" --help >/dev/null 2>&1; then
+        echo "Error: Meshtastic CLI is installed but not functioning correctly."
+        echo "Please check your installation or reinstall the Meshtastic CLI."
+        exit 1
+    fi
+
+    echo "Meshtastic CLI is installed and functioning correctly: $MESHTASTIC_CMD"
+}
+
+# Function to install Meshtastic CLI
 install_meshtastic_cli() {
     local venv_path="/opt/meshtastic-venv"
 
@@ -114,23 +158,31 @@ install_meshtastic_cli() {
         sudo python3 -m venv "$venv_path"
     fi
 
-    echo "Installing meshtastic Python library in virtual environment..."
+    echo "Installing Meshtastic Python library in virtual environment..."
     sudo "$venv_path/bin/pip" install meshtastic
 
-    echo "Adding meshtastic command to global PATH..."
+    echo "Adding Meshtastic command to global PATH if not already present..."
     local profile_script="/etc/profile.d/meshtastic.sh"
-    sudo bash -c "cat > $profile_script" <<EOL
-export PATH="$venv_path/bin:\$PATH"
-EOL
-    sudo chmod 0755 "$profile_script"
+    local export_line="export PATH=\"$venv_path/bin:\$PATH\""
 
-    if [[ -n "$BASH_SOURCE" ]]; then
-        echo "source $profile_script" >> "$HOME/.bashrc"
-        source "$profile_script"
-    elif [[ -n "$ZSH_NAME" ]]; then
-        echo "source $profile_script" >> "$HOME/.zshrc"
+    if ! grep -qF "$export_line" "$profile_script" 2>/dev/null; then
+        sudo bash -c "echo '$export_line' > $profile_script"
+        sudo chmod 0755 "$profile_script"
+        echo "Added Meshtastic to global PATH via $profile_script."
+    else
+        echo "Global PATH already includes Meshtastic command."
     fi
 
+    # Add to user's shell configuration files
+    for shell_rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [[ -f "$shell_rc" ]] && ! grep -qF "$export_line" "$shell_rc"; then
+            echo "$export_line" >> "$shell_rc"
+            echo "Added Meshtastic to PATH in $shell_rc."
+        fi
+    done
+
+    # Source the changes for the current session
+    export PATH="$venv_path/bin:$PATH"
     echo "Meshtastic CLI installation completed successfully."
 }
 
@@ -247,18 +299,7 @@ echo "-= Meshtastic Setup and Install Script =-"
 # Main script logic
 check_and_install_packages
 
-# Check and offer to install meshtastic CLI
-if check_command "meshtastic"; then
-    echo "Meshtastic CLI is already installed."
-else
-    echo "Meshtastic CLI is not installed."
-    read -p "Do you want to install it? (yes/no): [Default: yes]" choice
-    if [[ "$choice" == "no" ]]; then
-        echo "Meshtastic CLI installation skipped."
-    else
-        install_meshtastic_cli
-    fi
-fi
+check_meshtastic_cli
 
 # Always ask to install or update meshtasticd
 install_or_update_meshtasticd
