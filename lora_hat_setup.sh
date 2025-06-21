@@ -71,7 +71,7 @@ config_choice=${config_choice:-yes}
 
 if [[ "$config_choice" == "yes" ]]; then
     CONFIG_DIR="/etc/meshtasticd"
-    CONFIG_URL="https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/example_config/config.yaml"
+    CONFIG_URL="https://raw.githubusercontent.com/mikro6/meshtastic_scripts/refs/heads/main/example_config/config.yaml"
     TARGET_CONFIG_FILE="${CONFIG_DIR}/config.yaml"
 
     echo "Checking for existing Meshtasticd configuration..."
