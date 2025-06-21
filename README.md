@@ -1,4 +1,4 @@
-# Waveshare LoRa HAT and Meshtastic Setup Scripts
+# MeshADV Mini LoRa HAT and Meshtastic Setup Scripts
 
 This project contains a collection of scripts designed to streamline the setup and configuration of the Waveshare LoRaWAN/GNSS HAT and Meshtastic on Raspberry Pi devices.
 
