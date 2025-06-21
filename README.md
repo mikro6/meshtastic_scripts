@@ -17,7 +17,6 @@ This project contains a collection of scripts designed to streamline the setup a
 2. [Setup Instructions](#setup-instructions)
    - [Raspberry Pi LoRa HAT Configuration](#raspberry-pi-lora-hat-configuration)
    - [Meshtastic Setup](#meshtastic-setup)
-   - [NC Mesh Device Configuration](#nc-mesh-device-configuration)
 3. [Example Configuration](#example-configuration)
 4. [Credits](#credits)
 
@@ -25,8 +24,8 @@ This project contains a collection of scripts designed to streamline the setup a
 
 ## Requirements
 ### Hardware
-- Raspberry Pi (any model supported by Meshtastic and Waveshare LoRa HAT).
-- Waveshare SX1262 XXXM LoRaWAN/GNSS HAT ([Product Page](https://www.waveshare.com/wiki/SX1262_XXXM_LoRaWAN/GNSS_HAT)).
+- Raspberry Pi (any model supported by Meshtastic and MeshADV Mini LoRa HAT).
+- MeshADV Mini LoRa/GNSS HAT ([Product Page]([https://github.com/chrismyers2000/MeshAdv-Mini](https://github.com/chrismyers2000/MeshAdv-Mini))).
 
 ### Software
 - Raspberry Pi OS or another Debian-based Linux distribution.
@@ -39,7 +38,7 @@ This project contains a collection of scripts designed to streamline the setup a
 ### Raspberry Pi LoRa HAT Configuration
 To configure the LoRa HAT, run the following one-liner command:
 ```bash
-curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/lora_hat_setup.sh -o /tmp/lora_hat_setup.sh; sudo bash /tmp/lora_hat_setup.sh; rm /tmp/lora_hat_setup.sh
+curl -sL https://raw.githubusercontent.com/mikro6/meshtastic_scripts/refs/heads/main/lora_hat_setup.sh -o /tmp/lora_hat_setup.sh; sudo bash /tmp/lora_hat_setup.sh; rm /tmp/lora_hat_setup.sh
 ```
 - This script will enable SPI and I2C, configure the necessary device overlays, and ensure your Raspberry Pi is ready for the LoRaWAN/GNSS HAT.
 - The script will prompt for a reboot to apply changes.
@@ -49,7 +48,7 @@ curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/head
 ### Meshtastic Setup
 To install or update Meshtastic CLI and Meshtasticd, run the following command:
 ```bash
-curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/meshtastic_setup.sh -o /tmp/meshtastic_setup.sh; sudo bash /tmp/meshtastic_setup.sh; rm /tmp/meshtastic_setup.sh
+curl -sL https://raw.githubusercontent.com/mikro6/meshtastic_scripts/refs/heads/main/meshtastic_setup.sh -o /tmp/meshtastic_setup.sh; sudo bash /tmp/meshtastic_setup.sh; rm /tmp/meshtastic_setup.sh
 ```
 - The script will:
   - Check and install required dependencies.
@@ -60,24 +59,12 @@ curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/head
 
 ---
 
-### NC Mesh Device Configuration
-To configure a device for the NC Mesh network, run the following command:
-```bash
-curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/ncmesh_connect.sh -o /tmp/ncmesh_connect.sh; sudo bash /tmp/ncmesh_connect.sh; rm /tmp/ncmesh_connect.sh
-```
-- This script will:
-  - Prompt for the device owner name and short name.
-  - Allow selection of the device mode (Client, Router, etc.).
-  - Configure LoRa, GPS, MQTT, and channel settings specific to the NC Mesh network.
-
----
-
 ## Example Configuration
-This is an example configuration file for the Waveshare LoRaWAN/GNSS HAT that I am using on my Pi.
+This is an example configuration file for the MeshADV Mini LoRaWAN/GNSS HAT that I am using on my Pi.
 
 1. Download the example configuration:
    ```bash
-   curl -sL https://raw.githubusercontent.com/FixedBit/meshtastic_scripts/refs/heads/main/example_config/config.yaml | sudo tee /etc/meshtasticd/config.yaml > /dev/null
+   curl -sL https://raw.githubusercontent.com/mikro6/meshtastic_scripts/refs/heads/main/example_config/config.yaml | sudo tee /etc/meshtasticd/config.yaml > /dev/null
    ```
 
 2. Edit the file to suit your setup:
@@ -106,6 +93,8 @@ journalctl -u meshtasticd -b
   - Website: [NCMesh](https://ncmesh.net)  
   - Discord: [Join Here](https://discord.gg/xUzRAjHZk8)
 
+- **Forked** mikro6
+  - Modified for MeshADV Hat
 ---
 
 Happy Meshing! 🌐
