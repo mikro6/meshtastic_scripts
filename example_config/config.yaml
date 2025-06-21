@@ -1,16 +1,18 @@
-# This is the config script I am using for the SX1262 XXXM LoRaWAN/GNSS HAT
-# https://www.waveshare.com/wiki/SX1262_XXXM_LoRaWAN/GNSS_HAT
+# This is the config script I am using for the MeshADV Mini LoRaWAN/GNSS HAT
+# https://github.com/chrismyers2000/MeshAdv-Mini
 #
 # Note: It may work for others with other SX126X modules without GPS, but I have not tested it.
 #       If your board does not have GPS, just comment out the GPS section.
 ---
 Lora:
-  Module: sx1262 # Waveshare SX126X XXXM
-  DIO2_AS_RF_SWITCH: true
-  CS: 21
+  Module: sx1262 # Ebyte E22-900M22S
+  CS: 8
   IRQ: 16
   Busy: 20
-  Reset: 18
+  Reset: 24
+  TXen: 12
+  DIO2_AS_RF_SWITCH: true
+  DIO3_TCXO_VOLTAGE: true
 
 GPS:
 # For Pi 5, change the path to this: /dev/ttyAMA0
